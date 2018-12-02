@@ -1,0 +1,210 @@
+﻿@using WebSite.Models
+@model WebSite.Models.Event
+@{
+    ViewBag.Title = "Home Page";
+}
+
+@using (Html.BeginForm())
+{
+    <div class="form-group form-md-line-input has-warning form-md-floating-label">
+        <div class="input-group">
+
+            <div class="input-group-control">
+                @Html.DropDownListFor(model => model.Area, ((IEnumerable<Event>)ViewBag.Areas).Select(option => new SelectListItem
+           {
+               Text = option.Area,
+               Value = option.Area,
+               Selected = (Model != null) && (option.Area == Model.Area)
+           }), "", new { @class = "form-control", id = "Area" })
+                <label for="Area">Area</label>
+            </div>
+            <span class="input-group-btn btn-left">
+                <input type="submit" class="btn btn-primary" value="Search" />
+            </span>
+        </div>
+    </div>
+}
+
+
+@if (IsPost)
+{
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="dashboard-stat2 ">
+                <div class="display">
+                    <div class="number">
+                        <h3 class="font-green-sharp">
+                            <span data-counter="counterup" data-value="@ViewBag.Crime">@ViewBag.Crime</span>
+                            <small class="font-green-sharp"></small>
+                        </h3>
+                        <small>Crime</small>
+                    </div>
+                    <div class="icon">
+                        <i class="icon-pie-chart"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="dashboard-stat2 ">
+                <div class="display">
+                    <div class="number">
+                        <h3 class="font-red-haze">
+                            <span data-counter="counterup" data-value="@ViewBag.Violence">@ViewBag.Violence</span>
+                        </h3>
+                        <small>Violence</small>
+                    </div>
+                    <div class="icon">
+                        <i class="icon-pie-chart"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="dashboard-stat2 ">
+                <div class="display">
+                    <div class="number">
+                        <h3 class="font-blue-sharp">
+                            <span data-counter="counterup" data-value="@ViewBag.Traffic">@ViewBag.Traffic</span>
+                        </h3>
+                        <small>Traffic</small>
+                    </div>
+                    <div class="icon">
+                        <i class="icon-pie-chart"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="dashboard-stat2 ">
+                <div class="display">
+                    <div class="number">
+                        <h3 class="font-purple-soft">
+                            <span data-counter="counterup" data-value="@ViewBag.Litter">@ViewBag.Litter</span>
+                        </h3>
+                        <small>Litter</small>
+                    </div>
+                    <div class="icon">
+                        <i class="icon-pie-chart"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="portlet light ">
+                <div class="portlet-title">
+                    <div class="caption font-red">
+                        <span class="caption-subject bold uppercase">Report Pie</span>
+                        <span class="caption-helper"></span>
+                    </div>
+                    @*<div class="actions">
+                            <a href="#" class="btn btn-circle green btn-outline btn-sm">
+                                <i class="fa fa-pencil"></i> Export
+                            </a>
+                            <a href="#" class="btn btn-circle green btn-outline btn-sm">
+                                <i class="fa fa-print"></i> Print
+                            </a>
+                        </div>*@
+                </div>
+                <div class="portlet-body">
+                    <img src="/Home/Report/?area=@Model.Area" class="img-responsive" alt="No Tasks"/>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="portlet light ">
+                <div class="portlet-title">
+                    <div class="caption font-red">
+                        <span class="caption-subject bold uppercase">Sub Categorized Reports</span>
+                        <span class="caption-helper"></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <img src="/Home/LineReport/?area=@Model.Area" class="img-responsive" alt="No Tasks"/>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="portlet light ">
+                <div class="portlet-title">
+                    <div class="caption font-red">
+                        <span class="caption-subject bold uppercase">Categorized Reports</span>
+                        <span class="caption-helper"></span>
+                    </div>
+                    @*<div class="actions">
+                            <a href="#" class="btn btn-circle green btn-outline btn-sm">
+                                <i class="fa fa-pencil"></i> Export
+                            </a>
+                            <a href="#" class="btn btn-circle green btn-outline btn-sm">
+                                <i class="fa fa-print"></i> Print
+                            </a>
+                        </div>*@
+                </div>
+                <div class="portlet-body">
+                    <table class="table table-bordered table-responsive table-striped">
+                        <thead><tr><td>Category</td><td>Total Reports</td></tr></thead>
+                        <tbody>
+                            @foreach (var row in ViewBag.EventCategorized)
+                            {
+                                <tr>
+                                    <td>
+                                        @row.Name
+                                    </td>
+                                    <td>@row.Count</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @*<img src="/Charts/TasksInProcess" class="img-responsive" alt="No Tasks"/>*@
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="portlet light ">
+                <div class="portlet-title">
+                    <div class="caption font-red">
+                        <span class="caption-subject bold uppercase">Sub Categorized Reports</span>
+                        <span class="caption-helper"></span>
+                    </div>
+                    @*<div class="actions">
+                            <a href="#" class="btn btn-circle green btn-outline btn-sm">
+                                <i class="fa fa-pencil"></i> Export
+                            </a>
+                            <a href="#" class="btn btn-circle green btn-outline btn-sm">
+                                <i class="fa fa-print"></i> Print
+                            </a>
+                        </div>*@
+                </div>
+                <div class="portlet-body">
+                    <table class="table table-bordered table-responsive table-striped">
+                        <thead><tr><td>Category</td><td>SubCategory</td><td>Count</td></tr></thead>
+                        <tbody>
+                            @foreach (var row in ViewBag.SubCategorizedReports)
+                            {
+                                <tr>
+                                    <td>
+                                        @row.Name
+                                    </td>
+                                    <td>
+                                        @row.SubCategory
+                                    </td>
+                                    <td>@row.Count</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @*<img src="/Charts/TasksCompleted" class="img-responsive" alt="No Tasks"/>*@
+                </div>
+            </div>
+
+        </div>
+    </div>
+}

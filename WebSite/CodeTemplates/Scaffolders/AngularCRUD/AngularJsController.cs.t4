@@ -1,0 +1,256 @@
+﻿<#@ Template Language="C#" HostSpecific="True" Inherits="DynamicTransform" #>
+<#@ Output extension="js" #>
+<#@ assembly name="System.ComponentModel.DataAnnotations" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data.Entity" #>
+<#@ assembly name="System.Data.Linq" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.ComponentModel.DataAnnotations" #>
+<#@ import namespace="System.Data.Linq.Mapping" #>
+<#@ import namespace="System.Data.Objects.DataClasses" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+<# var viewDataType = (EnvDTE.CodeType) Model.ViewDataType; #>
+/**
+ * @ngdoc controller
+ * @module <#= Model.ViewDataTypeName ?? String.Empty #>App
+ * @name <#= Model.ViewDataTypeName ?? String.Empty #>AppDocumentation
+ * @description AngularJS controller for <#= Model.ViewDataTypeName ?? String.Empty #> View
+ * @param {vm} angularJS scope
+ * @param {$http} required for http services
+ *
+ * ###Additional information
+ * This is the <#= Model.ViewDataTypeName ?? String.Empty #>App module for model view binding (<#= Model.ViewDataTypeName ?? String.Empty #>)
+ */
+angular.module('<#= Model.ViewDataTypeName ?? String.Empty #>', ['datatables', 'datatables.tabletools', 'angularFileUpload'])
+	.controller('<#= Model.ViewDataTypeName ?? String.Empty #>Controller', ['$http', '$window', 'DTOptionsBuilder', 'DTColumnBuilder', 'FileUploader','$compile', '$scope',  <#= Model.ViewDataTypeName ?? String.Empty #>Controller]);
+
+function <#= Model.ViewDataTypeName ?? String.Empty #>Controller($http, $window, DTOptionsBuilder, DTColumnBuilder, FileUploader, $compile, $scope) {
+		var vm = this;
+		
+		vm.<#= Model.ViewDataTypeName ?? String.Empty #> = {};
+
+		vm.<#= Model.PluralViewDataType ?? String.Empty #> = [];
+
+		vm.dtOptions = DTOptionsBuilder.newOptions()
+        .withOption('ajax', {
+            dataSrc: "data",
+            url: "/api/<#= Model.PluralViewDataType ?? String.Empty #>Api/DataTableData",
+            type: "POST"
+        })
+        .withOption('deferRender', true)
+        .withOption('processing', true) 
+        .withOption('serverSide', true) 
+        .withPaginationType('full_numbers')
+		.withPaginationType('full_numbers')
+        .withOption('initComplete', function (settings) {
+            $compile(angular.element('#' + settings.sTableId).contents())($scope);
+        })
+        .withDisplayLength(10)
+        .withOption('aaSorting', [0, 'asc'])
+        .withTableTools('/Content/vendor/datatables-tabletools/swf/copy_csv_xls_pdf.swf')
+        .withTableToolsButtons([
+            'copy',
+            'print', {
+                'sExtends': 'collection',
+                'sButtonText': 'Save',
+                'aButtons': ['csv', 'xls', 'pdf']
+            }
+        ]);
+		vm.dtColumns = [
+		 <# foreach (ModelProperty property in GetModelProperties(Model.ViewDataType, false)) {
+							if (!property.IsPrimaryKey && !property.IsForeignKey && !property.IsReadOnly && 
+								property.Name != "CreatedBy" && property.Name != "UpdatedBy" && 
+								property.Name != "CreatedDate" && property.Name != "UpdatedDate" && 
+								property.Name != "IsDeleted" && property.Name != "Comp_Code" && property.Name!="Off_Code") { #>
+			DTColumnBuilder.newColumn('<#= property.Name #>').withTitle('<#= property.Name #>'),
+							<# }  } #>
+			DTColumnBuilder.newColumn(null).withTitle('Actions').notSortable().renderWith(actionsHtml)
+		];
+
+	    function actionsHtml(data, type, full, meta) {
+			vm.<#= Model.PluralViewDataType ?? String.Empty #>[data.Id] = data;
+			return '<a href="/<#= Model.Area ?? String.Empty #>/<#= Model.PluralViewDataType ?? String.Empty #>/Edit/' + data.Id + '" class="btn btn-icon-only yellow">                              <i class="fa fa-edit"></i>                            </a>                            |                            <a href="/<#= Model.Area ?? String.Empty #>/<#= Model.PluralViewDataType ?? String.Empty #>/Details/' + data.Id + '" class="btn btn-icon-only blue">                                <i class="fa fa-info"></i>                            </a>                            |                            <a class="btn btn-icon-only red" data-toggle="modal" ng-href="#delete' + data.Id + '">                                <i class="fa fa-trash-o"></i>                            </a>                            <div class="modal fade" id="delete' + data.Id + '" tabindex="-1" aria-hidden="true">                                <div class="modal-dialog">                                    <div class="modal-content">                                        <div class="modal-header">                                            <h4 class="modal-title">Are you sure you want to delete?</h4>                                        </div>                                        <div class="modal-footer">                                            <form name="<#= Model.ViewDataTypeName ?? String.Empty #>Form" ng-submit="<#= Model.ViewDataTypeName ?? String.Empty #>Form.$valid && vm.delete<#= Model.ViewDataTypeName ?? String.Empty #>(' + data.Id + ')" novalidate>                                                <p>                                                    <input type="submit" value="Delete" class="btn red" />                                                    <button type="button" class="btn default" data-dismiss="modal">Close</button>                                                </p>                                            </form>                                        </div>                                    </div>                                </div>                            </div>';
+		};
+
+		 vm.uploader = new FileUploader({
+            url: '/api/<#= Model.PluralViewDataType ?? String.Empty #>Api/',
+            formData: vm.<#= Model.ViewDataTypeName ?? String.Empty #>,
+            alias: "File"
+        });
+        function onBeforeUploadItem(item) {
+            item.formData.push = vm.<#= Model.ViewDataTypeName ?? String.Empty #>;
+            console.log(item);
+        }
+
+        vm.uploader.onBeforeUploadItem = onBeforeUploadItem;
+		<#
+			foreach (RelatedEntityInfo relation in ParentRelations) {
+		#>
+		vm.<#= relation.RelationNamePlural #> = [];
+		vm.get<#= relation.RelationNamePlural #> = function() {
+			$http.get('/api/<#= relation.RelationNamePlural #>Api/').success(function (data) {
+					vm.<#= relation.RelationNamePlural #> = data;
+                    toastr["info"]("Loaded <#= relation.RelationNamePlural #>");
+				}).error(function () {
+                    toastr["error"]("Could not Load <#= relation.RelationNamePlural #>");
+				});
+		}
+		<#
+}
+#>
+
+		vm.get<#= Model.PluralViewDataType ?? String.Empty #> = function () {
+				$http.get('/api/<#= Model.PluralViewDataType ?? String.Empty #>Api/').success(function (data) {
+					vm.<#= Model.PluralViewDataType ?? String.Empty #> = data;
+				}).error(function () {
+                    toastr["error"]("Could not Load <#= Model.PluralViewDataType ?? String.Empty #>");
+				});
+		};
+		vm.get<#= Model.ViewDataTypeName ?? String.Empty #>ById = function (id) {
+			$http.get('/api/<#= Model.PluralViewDataType ?? String.Empty #>Api/' + id).success(function (data) {
+				vm.<#= Model.ViewDataTypeName ?? String.Empty #> = data;
+				if (!vm.DisplayDetail) {
+					vm.DisplayDetail = true;
+				}
+			}).error(function () {
+                toastr["error"]("Could not Load <#= Model.ViewDataTypeName ?? String.Empty #>");
+			});
+		};
+
+		vm.edit<#= Model.ViewDataTypeName ?? String.Empty #> = function () {
+			$http.put('/api/<#= Model.PluralViewDataType ?? String.Empty #>Api/' + vm.<#= Model.ViewDataTypeName ?? String.Empty #>.Id, vm.<#= Model.ViewDataTypeName ?? String.Empty #>).success(function (data) {
+				vm.<#= Model.ViewDataTypeName ?? String.Empty #> = {};
+                toastr["success"]("Successfully saved <#= Model.ViewDataTypeName ?? String.Empty #>");
+				$window.location.href = '<#= Model.IndexPath #>';
+			}).error(function (data) {
+                toastr["error"]("Could not Save editted <#= Model.ViewDataTypeName ?? String.Empty #>");
+			});
+		};
+
+	
+		vm.save<#= Model.ViewDataTypeName ?? String.Empty #> = function () {
+			$http.post('/api/<#= Model.PluralViewDataType ?? String.Empty #>Api/', vm.<#= Model.ViewDataTypeName ?? String.Empty #>).success(function (data) {
+				toastr["success"]("Successfully saved <#= Model.ViewDataTypeName ?? String.Empty #>");
+                vm.<#= Model.ViewDataTypeName ?? String.Empty #> = {};
+				vm.DisplayDetail = false;
+				$window.location.href = '<#= Model.IndexPath #>';
+			}).error(function (data) {
+                toastr["error"]("Could not Save new <#= Model.ViewDataTypeName ?? String.Empty #>");
+			});
+		};
+
+		function removeItem(items, id) {
+                for (var item = 0; item < items.length; item++) {
+                    if (items[item].Id == id) {
+                        items.splice(item, 1);
+                }
+            }
+        };
+		vm.delete<#= Model.ViewDataTypeName ?? String.Empty #> = function (id) {
+			$http.delete('/api/<#= Model.PluralViewDataType ?? String.Empty #>Api/' + id).success(function (data) {
+				removeItem(vm.<#= Model.PluralViewDataType ?? String.Empty #>, id);
+                $("basic" + id).modal('hide');
+			    $('.modal-backdrop').remove();
+                toastr["success"]("Successfully deleted <#= Model.ViewDataTypeName ?? String.Empty #>");
+			}).error(function (data) {
+                toastr["error"]("Could not delete <#= Model.ViewDataTypeName ?? String.Empty #>");
+			});
+		};
+        
+
+	};
+
+
+<#+
+// Describes the information about a property on the model
+class ModelProperty {
+	public string Name { get; set; }
+	public string ValueExpression { get; set; }
+	public EnvDTE.CodeTypeRef Type { get; set; }
+	public bool IsPrimaryKey { get; set; }
+	public bool IsForeignKey { get; set; }
+	public bool IsReadOnly { get; set; }
+}
+
+// Change this list to include any non-primitive types you think should be eligible to be edited using a textbox
+static Type[] bindableNonPrimitiveTypes = new[] {
+	typeof(string),
+	typeof(decimal),
+	typeof(Guid),
+	typeof(DateTime),
+	typeof(DateTimeOffset),
+	typeof(TimeSpan),
+};
+
+// Call this to get the list of properties in the model. Change this to modify or add your
+// own default formatting for display values.
+List<ModelProperty> GetModelProperties(EnvDTE.CodeType typeInfo, bool includeUnbindableProperties) {
+	List<ModelProperty> results = GetEligibleProperties(typeInfo, includeUnbindableProperties);
+	
+	foreach (ModelProperty prop in results) {
+		if (prop.Type.UnderlyingTypeIs<double>() || prop.Type.UnderlyingTypeIs<decimal>()) {
+			prop.ValueExpression = "String.Format(\"{0:F}\", " + prop.ValueExpression + ")";
+		}
+		else if (prop.Type.UnderlyingTypeIs<DateTime>()) {
+			prop.ValueExpression = "String.Format(\"{0:g}\", " + prop.ValueExpression + ")";
+		}
+		else if (!IsBindableType(prop.Type)) {
+			prop.ValueExpression = GetValueExpression("Model." + prop.Name, (EnvDTE.CodeType)prop.Type.CodeType);
+		}
+	}
+
+	return results;
+}
+
+// Change this list to include the names of properties that should be selected to represent an entity as a single string
+static string[] displayPropertyNames = new[] { "Name", "Title", "LastName", "Surname", "Subject", "Count" };
+
+string GetValueExpression(string propertyExpression, EnvDTE.CodeType propertyType) {
+	if (propertyType != null) {
+		var chosenSubproperty = propertyType.DisplayColumnProperty() ?? propertyType.FindProperty(displayPropertyNames);
+		if (chosenSubproperty != null) {
+			var toStringSuffix = chosenSubproperty.Type.AsFullName == "System.String" ? "" : ".ToString()";
+			return String.Format("({0} == null ? \"None\" : {0}.{1}{2})", propertyExpression, chosenSubproperty.Name, toStringSuffix);
+		}
+	}
+	return "Html.DisplayTextFor(_ => " + propertyExpression + ").ToString()";
+}
+
+// Helper
+List<ModelProperty> GetEligibleProperties(EnvDTE.CodeType typeInfo, bool includeUnbindableProperties) {
+	List<ModelProperty> results = new List<ModelProperty>();
+	if (typeInfo != null) {
+		foreach (var prop in typeInfo.VisibleMembers().OfType<EnvDTE.CodeProperty>()) {
+			if (prop.IsReadable() && !prop.HasIndexParameters() && (includeUnbindableProperties || IsBindableType(prop.Type))) {
+				results.Add(new ModelProperty {
+					Name = prop.Name,
+					ValueExpression = "Model." + prop.Name,
+					Type = prop.Type,
+					IsPrimaryKey = Model.PrimaryKeyName == prop.Name,
+					IsForeignKey = ParentRelations.Any(x => x.RelationProperty == prop),
+					IsReadOnly = !prop.IsWriteable()
+				});
+			}
+		}
+	}
+
+	return results;
+}
+
+IEnumerable<RelatedEntityInfo> ParentRelations {
+	get { return ((IEnumerable)Model.RelatedEntities).OfType<RelatedEntityInfo>().Where(x => x.RelationType == RelationType.Parent); }
+}
+
+IEnumerable<RelatedEntityInfo> ChildParentRelations {
+	get { return ((IEnumerable)Model.RelatedChildEntities).OfType<RelatedEntityInfo>().Where(x => x.RelationType == RelationType.Parent); }
+}
+
+// Helper
+bool IsBindableType(EnvDTE.CodeTypeRef type) {
+	return type.UnderlyingIsPrimitive() || bindableNonPrimitiveTypes.Any(x => type.UnderlyingTypeIs(x));
+}
+
+#>

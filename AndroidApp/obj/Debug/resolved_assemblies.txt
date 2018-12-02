@@ -1,0 +1,12 @@
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\AndroidApp.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\Mono.Android.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\mscorlib.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\System.Core.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\System.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\System.Xml.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\System.Xml.Linq.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\Xamarin.Android.Support.Design.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\Xamarin.Android.Support.v4.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\Xamarin.Android.Support.v7.AppCompat.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\System.Runtime.Serialization.dll
+E:\FYP\vReport\vReport\AndroidApp\obj\Debug\assemblies\System.ServiceModel.Internals.dll

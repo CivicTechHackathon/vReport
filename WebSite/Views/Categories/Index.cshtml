@@ -1,0 +1,38 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@{
+    ViewBag.Title = "Index";
+    ViewBag.NgModule = "Category";
+    ViewBag.NgController = "CategoryController";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="portlet light bordered" ng-init="vm.getCategories()">
+    <div class="portlet-title">
+        <div class="caption font-red-sunglo">
+            <i class="fa fa-list font-red-sunglo"></i>
+            <span class="caption-subject bold uppercase">
+                <a class="red-color-label" href="//Categories/Create" >Category</a>
+            </span>
+        </div>
+		<a href="//Categories/Create" class="btn btn-success pull-right"><i class="fa fa-plus-circle"></i> Add Category</a>
+    </div>
+	<div class="portlet-body form table-responsive">
+		<table datatable="" dt-options="vm.dtOptions" dt-columns="vm.dtColumns" class="cell-border hover table table-striped"></table>
+    </div>
+</div>
+@section scripts{
+<script src="~/Scripts/app//CategoryController.js"></script>
+}

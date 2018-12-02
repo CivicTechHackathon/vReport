@@ -1,0 +1,10 @@
+E:\FYP\vReport\vReport\DataLayer\bin\Debug\DataLayer.dll.config
+E:\FYP\vReport\vReport\DataLayer\bin\Debug\DataLayer.dll
+E:\FYP\vReport\vReport\DataLayer\bin\Debug\DataLayer.pdb
+E:\FYP\vReport\vReport\DataLayer\bin\Debug\EntityFramework.dll
+E:\FYP\vReport\vReport\DataLayer\bin\Debug\EntityFramework.SqlServer.dll
+E:\FYP\vReport\vReport\DataLayer\bin\Debug\EntityFramework.xml
+E:\FYP\vReport\vReport\DataLayer\bin\Debug\EntityFramework.SqlServer.xml
+E:\FYP\vReport\vReport\DataLayer\obj\Debug\DataLayer.csprojResolveAssemblyReference.cache
+E:\FYP\vReport\vReport\DataLayer\obj\Debug\DataLayer.dll
+E:\FYP\vReport\vReport\DataLayer\obj\Debug\DataLayer.pdb

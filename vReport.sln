@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApplication", "WebApplication", "{333287BF-FFAC-49AB-9437-9F97A35B9BD6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MobileApplication", "MobileApplication", "{3649D719-78BB-4DD6-8AA6-BAB167A17D27}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataLayer", "DataLayer", "{9DEAF81E-CA16-4E92-82B8-01B3FF6FC101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "DataLayer\DataLayer.csproj", "{9E935F4F-B935-4753-A9C3-A06F05E8737D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSite", "WebSite\WebSite.csproj", "{711AA93F-CA5C-4F46-9F7F-717FA1C83E07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidApp", "AndroidApp\AndroidApp.csproj", "{0393D583-541C-43B7-8693-ABD7B6548E6F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E935F4F-B935-4753-A9C3-A06F05E8737D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E935F4F-B935-4753-A9C3-A06F05E8737D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E935F4F-B935-4753-A9C3-A06F05E8737D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E935F4F-B935-4753-A9C3-A06F05E8737D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{711AA93F-CA5C-4F46-9F7F-717FA1C83E07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{711AA93F-CA5C-4F46-9F7F-717FA1C83E07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{711AA93F-CA5C-4F46-9F7F-717FA1C83E07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{711AA93F-CA5C-4F46-9F7F-717FA1C83E07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9E935F4F-B935-4753-A9C3-A06F05E8737D} = {9DEAF81E-CA16-4E92-82B8-01B3FF6FC101}
+		{711AA93F-CA5C-4F46-9F7F-717FA1C83E07} = {333287BF-FFAC-49AB-9437-9F97A35B9BD6}
+		{0393D583-541C-43B7-8693-ABD7B6548E6F} = {3649D719-78BB-4DD6-8AA6-BAB167A17D27}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://sage5tech.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = DataLayer\\DataLayer.csproj
+		SccProjectTopLevelParentUniqueName1 = vReport.sln
+		SccProjectName1 = DataLayer
+		SccLocalPath1 = DataLayer
+		SccProjectUniqueName2 = WebSite\\WebSite.csproj
+		SccProjectTopLevelParentUniqueName2 = vReport.sln
+		SccProjectName2 = WebSite
+		SccLocalPath2 = WebSite
+		SccProjectUniqueName3 = AndroidApp\\AndroidApp.csproj
+		SccProjectTopLevelParentUniqueName3 = vReport.sln
+		SccProjectName3 = AndroidApp
+		SccLocalPath3 = AndroidApp
+	EndGlobalSection
+EndGlobal

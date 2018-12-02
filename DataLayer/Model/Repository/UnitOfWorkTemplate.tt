@@ -1,0 +1,44 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+namespace DataLayer.Model.Repository
+{
+    public partial class UnitOfWork
+    {
+<#
+    foreach(EntityString item in RepositoryName)
+    {
+#>
+
+        private GenericRepository<<#= item.Name #>> _<#= item.PluralName.ToLower() #>Repository;
+        public GenericRepository<<#= item.Name #>> <#= item.PluralName #>Repository
+        {
+			get { return _<#= item.PluralName.ToLower() #>Repository ?? (_<#= item.PluralName.ToLower() #>Repository = new GenericRepository<<#= item.Name #>>(_context)); }
+        }
+<#
+    }
+#> 
+    }
+}
+
+<#+
+    class EntityString
+    {
+        public string Name { get; set; }
+        public string PluralName { get; set; }
+    }
+     
+    // Insert the EntityString for every Repository. Name and PluralName respectively...
+    List<EntityString> RepositoryName {
+        get { 
+            return new List<EntityString> { 
+				
+					new EntityString { Name = "JumboSaleRollRDetail", PluralName = "JumboSaleRollRDetails" },
+             }; 
+        }
+    }
+ #>

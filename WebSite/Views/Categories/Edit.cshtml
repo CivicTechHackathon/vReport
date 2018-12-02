@@ -1,0 +1,53 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@model DataLayer.Model.Entities.Category
+@{
+    ViewBag.Title = "Edit";
+    ViewBag.NgModule = "Category";
+    ViewBag.NgController = "CategoryController";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+<div class="portlet box green">
+	<div class="portlet-title">
+		<div class="caption">
+			<i class="fa fa-plus"></i> Edit Category </div>
+        </div>
+		<div class="portlet-body form">
+			<form name="CategoryForm" ng-submit="CategoryForm.$valid && vm.saveCategory()" novalidate class="form-horizontal" ng-init="vm.getCategoryById(@ViewBag.Id)">
+				<div class="form-body">
+					@Html.Partial("_CreateOrEdit")
+					<div class="form-actions">
+						<div class="row">
+							<div class="col-md-offset-3 col-md-9">
+								<input type="submit" value="Save" class="btn btn-circle green" />
+								@Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-circle grey-salsa btn-outline" })
+                            </div>
+                        </div>
+                    </div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+@section scripts{
+<script src="~/Scripts/app//CategoryController.js"></script>
+}
+

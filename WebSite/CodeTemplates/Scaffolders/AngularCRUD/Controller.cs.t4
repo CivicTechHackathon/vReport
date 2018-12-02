@@ -1,0 +1,267 @@
+﻿<#@ Template Language="C#" HostSpecific="True" Inherits="DynamicTransform" #>
+<#@ Output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.ComponentModel.DataAnnotations" #>
+<#@ assembly name="System.Data.Entity" #>
+<#@ assembly name="System.Data.Linq" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.ComponentModel.DataAnnotations" #>
+<#@ import namespace="System.Data.Linq.Mapping" #>
+<#@ import namespace="System.Data.Objects.DataClasses" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Http;
+using <#= Model.Namespace #>.Models;
+
+namespace <#= Model.ApiControllerName #>
+{
+	[Route("api/<#= Model.PluralController #>Api/{id?}", Name = "api_<#= Model.PluralController #>Api")]
+	public class <#= Model.PluralController #>ApiController : ApiController 
+	{
+        private readonly <#=  Model.DbContextType #> _db = new <#= Model.DbContextType #>();
+		
+		public List<<#= Model.ModelType #>> GetAll()
+		{
+			return _db.<#= Model.PluralController #>.ToList();
+		}
+
+		public IHttpActionResult Get<#= Model.ModelType #>(int id)
+		{
+			<#= Model.ModelType #> <#= Model.ModelType.ToLower() #> = _db.<#= Model.PluralController #>.Find(id);
+			if (<#= Model.ModelType.ToLower() #> == null)
+			{
+				return NotFound();
+			}
+
+			return Ok(<#= Model.ModelType.ToLower() #>);
+		}
+
+		public IHttpActionResult Post<#= Model.ModelType #>(<#= Model.ModelType #> <#= Model.ModelType.ToLower() #>)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			<#= Model.ModelType.ToLower() #>.CreatedBy = User.Identity.Name;
+			<#= Model.ModelType.ToLower() #>.CreatedDate = DateTime.Now;
+			_db.<#= Model.PluralController #>.Add(<#= Model.ModelType.ToLower() #>);
+			_db.SaveChanges();
+
+			return CreatedAtRoute("api_<#= Model.PluralController #>Api", new { id = <#= Model.ModelType.ToLower() #>.Id }, <#= Model.ModelType.ToLower() #>);
+		}
+
+		public IHttpActionResult Put<#= Model.ModelType #>(int id, <#= Model.ModelType #> <#= Model.ModelType.ToLower() #>)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			if (id != <#= Model.ModelType.ToLower() #>.Id)
+			{
+				return BadRequest();
+			}
+
+			<#= Model.ModelType.ToLower() #>.UpdatedBy = User.Identity.Name;
+			<#= Model.ModelType.ToLower() #>.UpdatedDate = DateTime.Now;
+			_db.Entry(<#= Model.ModelType.ToLower() #>).State = EntityState.Modified;
+			try
+			{
+				_db.SaveChanges();
+			}
+			catch (DbUpdateConcurrencyException)
+			{
+				if (!<#= Model.ModelType #>Exists(id))
+				{
+					return NotFound();
+				}
+				else
+				{
+					throw;
+				}
+			}
+
+			return StatusCode(HttpStatusCode.NoContent);
+		}
+
+		public IHttpActionResult Delete<#= Model.ModelType #>(int id)
+		{
+			<#= Model.ModelType #> <#= Model.ModelType.ToLower() #> = _db.<#= Model.PluralController #>.Find(id);
+			if (<#= Model.ModelType.ToLower() #> == null)
+			{
+				return NotFound();
+			}
+
+			_db.<#= Model.PluralController #>.Remove(<#= Model.ModelType.ToLower() #>);
+			_db.SaveChanges();
+
+			return Ok(<#= Model.ModelType.ToLower() #>);
+		}
+
+		private bool <#= Model.ModelType #>Exists(int id)
+		{
+			return _db.<#= Model.PluralController #>.Count(m => m.Id == id) > 0;
+		}
+
+		[System.Web.Http.Route("api/<#= Model.PluralController #>Api/DataTableData", Name = "api_<#= Model.PluralController #>DataTableData")]
+        [System.Web.Http.HttpPost]
+        public dynamic GetData()
+        {
+            //Datatable parameter
+            var draw = HttpContext.Current.Request.Form.GetValues("draw").FirstOrDefault();
+			
+			//paging parameter
+            var start = HttpContext.Current.Request.Form.GetValues("start").FirstOrDefault();
+            var length = HttpContext.Current.Request.Form.GetValues("length").FirstOrDefault();
+            
+			//sorting parameter
+            var sortColumn = HttpContext.Current.Request.Form.GetValues("columns[" + HttpContext.Current.Request.Form.GetValues("order[0][column]").FirstOrDefault() + "][name]").FirstOrDefault();
+            var sortColumnDir = HttpContext.Current.Request.Form.GetValues("order[0][dir]").FirstOrDefault();
+            
+			//filter parameter
+            var searchValue = HttpContext.Current.Request.Form.GetValues("search[value]").FirstOrDefault();
+            
+			List<<#= Model.ModelType #>> <#= Model.PluralController #> = new List<<#= Model.ModelType #>>();
+            int pageSize = length != null ? Convert.ToInt32(length) : 0;
+            int skip = start != null ? Convert.ToInt32(start) : 0;
+            int recordsTotal = 0;
+            //Database query
+			IQueryable<<#= Model.ModelType #>> v = _db.<#= Model.PluralController #>;
+
+            //search
+            if (!string.IsNullOrEmpty(searchValue))
+            {
+				v = v.Where(a =>
+							
+			<# foreach (ModelProperty property in GetModelProperties(Model.ViewDataType, false)) {
+							if (!property.IsPrimaryKey && !property.IsForeignKey && !property.IsReadOnly && 
+								property.Name != "CreatedBy" && property.Name != "UpdatedBy" && 
+								property.Name != "CreatedDate" && property.Name != "UpdatedDate" && 
+								property.Name != "IsDeleted" && property.Name != "Comp_Code" && property.Name!="Off_Code" && property.Type.UnderlyingTypeIs<string>()) {
+						#>
+							a.<#= property.Name #>.Contains(searchValue) ||
+							<#
+        }
+    }
+						#>
+                     );
+            }
+
+            //sort
+            if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDir)))
+            {
+                //for make sort simpler we will add Syste.Linq.Dynamic reference
+                v = v.OrderBy(m => m.Id);
+            }
+
+            recordsTotal = v.Count();
+             <#= Model.PluralController #> =
+                v.OrderBy(m => m.Id)
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+            return new
+                {
+                    draw = draw,
+                    recordsFiltered = recordsTotal,
+                    recordsTotal = recordsTotal,
+                    data = <#= Model.PluralController #>
+                };
+        }
+	}
+}
+<#+
+// Describes the information about a property on the model
+class ModelProperty {
+    public string Name { get; set; }
+    public string ValueExpression { get; set; }
+	public EnvDTE.CodeTypeRef Type { get; set; }
+    public bool IsPrimaryKey { get; set; }
+	public bool IsForeignKey { get; set; }
+	public bool IsReadOnly { get; set; }
+            }
+
+// Change this list to include any non-primitive types you think should be eligible to be edited using a textbox
+static Type[] bindableNonPrimitiveTypes = new[] {
+    typeof(string),
+    typeof(decimal),
+    typeof(Guid),
+    typeof(DateTime),
+    typeof(DateTimeOffset),
+    typeof(TimeSpan),
+};
+
+// Call this to get the list of properties in the model. Change this to modify or add your
+// own default formatting for display values.
+List<ModelProperty> GetModelProperties(EnvDTE.CodeType typeInfo, bool includeUnbindableProperties) {
+    List<ModelProperty> results = GetEligibleProperties(typeInfo, includeUnbindableProperties);
+    
+    foreach (ModelProperty prop in results) {
+        if (prop.Type.UnderlyingTypeIs<double>() || prop.Type.UnderlyingTypeIs<decimal>()) {
+            prop.ValueExpression = "String.Format(\"{0:F}\", " + prop.ValueExpression + ")";
+        }
+        else if (prop.Type.UnderlyingTypeIs<DateTime>()) {
+            prop.ValueExpression = "String.Format(\"{0:g}\", " + prop.ValueExpression + ")";
+        }
+		else if (!IsBindableType(prop.Type)) {
+			prop.ValueExpression = GetValueExpression("Model." + prop.Name, (EnvDTE.CodeType)prop.Type.CodeType);
+		}
+    }
+
+    return results;
+}
+
+// Change this list to include the names of properties that should be selected to represent an entity as a single string
+static string[] displayPropertyNames = new[] { "Name", "Title", "LastName", "Surname", "Subject", "Count" };
+
+string GetValueExpression(string propertyExpression, EnvDTE.CodeType propertyType) {
+	if (propertyType != null) {
+		var chosenSubproperty = propertyType.DisplayColumnProperty() ?? propertyType.FindProperty(displayPropertyNames);
+		if (chosenSubproperty != null) {
+			var toStringSuffix = chosenSubproperty.Type.AsFullName == "System.String" ? "" : ".ToString()";
+			return String.Format("({0} == null ? \"None\" : {0}.{1}{2})", propertyExpression, chosenSubproperty.Name, toStringSuffix);
+		}
+	}
+	return "Html.DisplayTextFor(_ => " + propertyExpression + ").ToString()";
+}
+
+// Helper
+List<ModelProperty> GetEligibleProperties(EnvDTE.CodeType typeInfo, bool includeUnbindableProperties) {
+    List<ModelProperty> results = new List<ModelProperty>();
+	if (typeInfo != null) {
+		foreach (var prop in typeInfo.VisibleMembers().OfType<EnvDTE.CodeProperty>()) {
+			if (prop.IsReadable() && !prop.HasIndexParameters() && (includeUnbindableProperties || IsBindableType(prop.Type))) {
+				results.Add(new ModelProperty {
+					Name = prop.Name,
+					ValueExpression = "Model." + prop.Name,
+					Type = prop.Type,
+					IsPrimaryKey = Model.PrimaryKeyName == prop.Name,
+					IsForeignKey = ParentRelations.Any(x => x.RelationProperty == prop),
+					IsReadOnly = !prop.IsWriteable()
+				});
+			}
+		}
+	}
+
+    return results;
+}
+
+IEnumerable<RelatedEntityInfo> ParentRelations {
+	get { return ((IEnumerable)Model.RelatedEntities).OfType<RelatedEntityInfo>().Where(x => x.RelationType == RelationType.Parent); }
+}
+
+// Helper
+bool IsBindableType(EnvDTE.CodeTypeRef type) {
+    return type.UnderlyingIsPrimitive() || bindableNonPrimitiveTypes.Any(x => type.UnderlyingTypeIs(x));
+}
+#>
